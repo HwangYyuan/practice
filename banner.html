@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        *{margin: 0;padding: 0;}
+        .wrap{
+            height:378px;
+            width:640px;
+            overflow:hidden;
+            position:relative;
+        }
+        .wrap ul{
+            list-style:none;
+            position:absolute;
+            left:0;top:0;
+            overflow:hidden;
+        }
+        .wrap ul li{
+            float:left;
+        }
+        .wrap .page{position:absolute;bottom:5px;right:50%;transform:translate(0,-50%);}
+        .wrap .page span{background:#ccc;display:inline-block;margin:3px;width:14px;height:14px;border-radius:50%;}
+        .wrap .page span.active{background:orange;}
+        .wrap .left{display:none;position:absolute;left:0;top:50%;width:30px;height:30px;background:#ccc;z-index:1;opacity:0.7;text-align:center;}
+        .wrap .right{display:none;position:absolute;right:0;top:50%;width:30px;height:30px;background:#ccc;z-index:1;opacity:0.7;text-align:center;}
+
+    </style>
+    <script src="../common.js" type="text/javascript"></script>
+</head>
+<body>
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded',()=>{
+        let wrap=document.querySelector('.wrap');
+        let ul=wrap.children[0];
+        let left=wrap.children[1];
+        let right=wrap.children[2];
+        //给ul添加第一张照片
+        ul.appendChild(ul.children[0].cloneNode(true));
+        let len=ul.children.length;
+        
+        //计算ul的宽度
+        ul.style.width=wrap.clientWidth*len+'px';
+        let index=0;
+
+
+
+        //添加圆点
+           let page =document.createElement('div');
+           page.className='page';
+           let content='';
+           for(let i = 0;i<len-1;i++){
+            content+=`<span></span>`
+           }
+           page.innerHTML=content;
+           page.children[index].className='active';
+           wrap.appendChild(page);
+
+           //鼠标移入停止定时器
+           wrap.onmouseover=function(){
+            clearInterval(timer);
+            left.style.display='block';
+            right.style.display='block';
+           }
+           //点击left图片
+           left.onclick=function(){
+            index--;
+            show();
+           }
+           right.onclick=function(){
+            autoPlay();
+           }
+           //鼠标移出定时器启动
+           wrap.onmouseout=function(){
+             timer=setInterval(autoPlay,2000);
+             left.style.display='none';
+             right.style.display='none';
+           }
+
+        let timer=setInterval(autoPlay,2000);
+
+
+        function show(){
+               if(index>=len){
+                //无缝滚动的关键，在完成复制图片后瞬间回到初始状态
+                    ul.style.left=0;
+                    index=1;
+                }else if(index<0){
+                    ul.style.left=-wrap.clientWidth*(len-1)+'px';
+                    index=len-2;
+                }
+                let target=-index*wrap.clientWidth;
+                animate(ul,{left:target})
+                for(let i = 0;i<len-1;i++){
+                    //高亮页码
+                    if(i===index%(len-1)){
+                       page.children[i].className='active' 
+                    }else{
+                        page.children[i].className=''; 
+                    }
+                }
+            }   
+        
+        function autoPlay(){
+            index++;
+            show();
+          }  
+    })
+    </script>
+    <div class="wrap">
+        <ul>
+            <li><img src="img/1.jpg" alt="" /></li>
+            <li><img src="img/2.jpg" alt="" /></li>
+            <li><img src="img/3.jpg" alt="" /></li>
+            <li><img src="img/4.jpg" alt="" /></li>
+            <li><img src="img/5.jpg" alt="" /></li>
+        </ul>
+        <div class="left">&lt;</div>
+        <div class="right">&gt;</div>
+    </div>
+</body>
+</html>
